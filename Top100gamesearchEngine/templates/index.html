@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 100 Games Search Engine</title>
+    <!-- Include Bootstrap CSS -->
+    <link 
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" 
+      rel="stylesheet" 
+      crossorigin="anonymous">
+    <style>
+      /* Background and Global Styles */
+      body {
+        background-image: url("{{ url_for('static', filename='img/top25modernpcgames-blogroll-1663951042311.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        color: white;
+      }
+
+      .background-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Black with transparency */
+        z-index: -1; /* Behind content */
+      }
+
+      /* Navbar */
+      .navbar-brand {
+        font-weight: bold;
+        font-size: 1.5rem;
+        color: #00d8ff !important; /* Highlighted color for brand */
+      }
+
+      .navbar-nav .nav-link {
+        color: #ffffff !important;
+      }
+
+      .navbar-nav .nav-link:hover {
+        color: #00adb5 !important;
+      }
+
+      /* Search Container */
+      .search-container {
+        margin-top: 100px;
+        text-align: center;
+      }
+
+      .search-container input {
+        border-radius: 20px;
+      }
+
+      .btn-dark {
+        background-color: #00adb5;
+        border-color: #00adb5;
+        color: white;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn-dark:hover {
+        background-color: #007a8c;
+      }
+
+      /* Results Section */
+      #results-container {
+        margin-top: 50px;
+      }
+
+      .result-card {
+        display: flex;
+        flex-direction: row;
+        background: rgba(34, 40, 49, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        transition: background-color 0.2s ease, transform 0.2s ease;
+        color: white;
+      }
+
+      .result-card:hover {
+        background-color: rgba(45, 52, 64, 0.9);
+        transform: translateY(-5px);
+      }
+
+      .result-card img {
+        width: 150px;
+        height: auto;
+        margin-right: 20px;
+        border-radius: 5px;
+        object-fit: cover;
+      }
+
+      .result-card h5 {
+        color: #00d8ff;
+        font-size: 18px;
+        font-weight: bold;
+        margin: 0 0 10px;
+      }
+
+      .result-card p {
+        margin: 0 0 5px;
+      }
+
+      /* Tags */
+      .tags {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .tag {
+        background-color: #393e46;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        color: #eeeeee;
+        transition: background-color 0.3s;
+        white-space: nowrap; /* Ensure tag text stays on one line */
+      }
+
+      .result-card h5:last-of-type {
+        font-size: 14px; /* Smaller font size */
+        color: gray; /* Gray color */
+        margin-top: 10px; /* Add spacing if needed */
+      }
+
+
+      .tag:hover {
+        background-color: #00adb5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="background-overlay"></div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('index') }}">Game Search</a>
+        <button 
+          class="navbar-toggler" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navbarNav" 
+          aria-controls="navbarNav" 
+          aria-expanded="false" 
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="{{ url_for('index') }}">Home</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row justify-content-center search-container">
+        <div class="col-md-8">
+          <h1 class="text-center mb-4">Top 100 Games Search Engine</h1>
+          <form method="GET" action="{{ url_for('search') }}" class="d-flex">
+            <input 
+              type="text" 
+              class="form-control me-2" 
+              name="keyword" 
+              placeholder="Type to search..." 
+              autofocus>
+            <button type="submit" class="btn btn-dark">Search</button>
+          </form>
+        </div>
+      </div>
+      <div class="row" id="results-container">
+        {% if hits %}
+          {% for hit in hits %}
+          <a href="{{ hit['url'] }}" class="text-decoration-none">
+            <div class="col-md-8 offset-md-2 result-card">
+              <img src="{{ hit['image'] }}" alt="{{ hit['name'] }}">
+              <div>
+                <h5>{{ hit['name'] }}</h5>
+                <p>{{ hit['description'] }}</p>
+                <p><strong>Price:</strong> {{ hit['price'] }}</p>
+                <p><strong>Tags:</strong></p>
+                <div class="tags">
+                  {% for tag in hit['tag'].split(',') %}
+                    <span class="tag">{{ tag }}</span>
+                  {% endfor %}
+                </div>
+                <h5>Score: {{hit['score']}}</h5>
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+        {% else %}
+          <div class="col-md-8 offset-md-2 text-center mt-4">
+            <p class="text-muted">No results found. Try another keyword!</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Include Bootstrap JS -->
+    <script 
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" 
+      crossorigin="anonymous">
+    </script>
+  </body>
+</html>
